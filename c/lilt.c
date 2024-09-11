@@ -85,6 +85,7 @@ lv* globals(void){
 	dset(env,lmistr("path"     ),lmnat(n_path,NULL));
 	dset(env,lmistr("exit"     ),lmnat(n_exit,NULL));
 	dset(env,lmistr("shell"    ),lmnat(n_shell,NULL));
+	dset(env,lmistr("chdir"    ),lmnat(n_chdir,NULL));
 	dset(env,lmistr("eval"     ),lmnat(n_eval,NULL));
 	dset(env,lmistr("import"   ),lmnat(n_import,NULL));
 	dset(env,lmistr("random"   ),lmnat(n_random,NULL));

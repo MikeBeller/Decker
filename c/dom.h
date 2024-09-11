@@ -2883,7 +2883,7 @@ typedef struct {int dir;char name[PATH_MAX];} dir_item;
 dir_item*directory;int directory_count=0,directory_size=0;
 enum file_filter{filter_none,filter_deck,filter_data,filter_code,filter_sound,filter_image,filter_gif};
 void directory_push(int dir,char*name,int filter){
-	if(name[0]=='.')return;
+	if(name[0]=='.'&&has_suffix(name, "."))return;
 	if(!dir&&filter==filter_deck&&!has_suffix(name,".html")&&!has_suffix(name,".deck"))return;
 	if(!dir&&filter==filter_data&&!has_suffix(name,".txt")&&!has_suffix(name,".csv"))return;
 	if(!dir&&filter==filter_code&&!has_suffix(name,".txt")&&!has_suffix(name,".lil"))return;
@@ -2996,10 +2996,14 @@ lv*n_dir(lv*self,lv*a){
 	r->kv[0]=lmistr("dir");return r;
 }
 #ifndef _WIN32
+#include <unistd.h>
 lv*n_shell(lv*self,lv*a){
 	(void)self;lv*x=ls(l_first(a)),*r=lmd();FILE*child=popen(x->sv,"r");str o=str_new();
 	while(1){int c=fgetc(child);if(feof(child))break;str_addraw(&o,c);}int e=pclose(child);lv*os=lmstr(o);
 	return dset(r,lmistr("out"),lmutf8(os->sv)),dset(r,lmistr("exit"),lmn(WIFEXITED(e)?WEXITSTATUS(e): -1)),r;
+}
+lv*n_chdir(lv*self,lv*a) {
+	(void)self;lv*x=ls(l_first(a));return (chdir(x->sv) == -1 ? NONE : ONE);
 }
 #endif
 lv*n_path(lv*self,lv*a){
@@ -3028,6 +3032,7 @@ lv* interface_danger(lv*self,lv*i,lv*x){
 	ikey("read"    )return lmnat(n_readfile ,self);
 #ifndef _WIN32
 	ikey("shell"   )return lmnat(n_shell    ,self);
+	ikey("chdir"   )return lmnat(n_chdir    ,self);
 #endif
 	return x?x:NONE;
 }
